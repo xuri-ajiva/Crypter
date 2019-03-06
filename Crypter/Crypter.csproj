@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{240E0C82-9A59-40C7-9606-54AD69F8E1D6}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Cipher</RootNamespace>
-    <AssemblyName>Cipher</AssemblyName>
+    <RootNamespace>crypter</RootNamespace>
+    <AssemblyName>crypter</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
