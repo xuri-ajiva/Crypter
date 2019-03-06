@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.421
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crypter", "Crypter\Crypter.csproj", "{240E0C82-9A59-40C7-9606-54AD69F8E1D6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "crypter", "Crypter\crypter.csproj", "{240E0C82-9A59-40C7-9606-54AD69F8E1D6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
