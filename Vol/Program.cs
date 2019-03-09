@@ -9,9 +9,9 @@ namespace Vol
         //replace thes strings with your encodet strings
 
             //is not a working string 
-        public static string _passwd_ = "fgTLbSyV1ymjO3unA0AGR7p+cQsT8QYf0ZQ/cjJ/SN3AEFbIsBNQ/LOkeii2GiDA/FXnT17lkJGJeAHDVu++vb2zzNUTRZuu38vyQ7LDmnTXkM7x3QsMeSJ5F0lnlGLj5O";
+        public static string _passwd_ = "fgTLbSyV1ymjO3unA0AGR7p+cQsT8QYf0ZQ/cjJ/SN3AEFbIsBNQ/LOkeii2GiDAX/FnT17lkJGJeAHDVu++vb2zzNUTRZuu38vyQ7LDmnTXkM7x3QsMeSJ5F0lnlGLj5O";
 
-        public static string Golbal_vonumendatei = "o+KpbWPXMJXImc6hqjlR2i/q/4CdgJFLMGjOdZ/zNkzPmpMHvmE4jEi+Ar3xfbsCUQihd8cKxirPEqwq0IXMGWXY2TjKNoeHJv3xGFWOgIhEr6QAE1caLaC8XSE7+yPd";
+        public static string Golbal_vonumendatei = "+Ah04ethGTlcopmDovkXupQ1iXCn//x0Kp6ehyqMUVZj2YTjPmgrzSL3XRk0X8UDYALBuecfOAuA6KxZxBIneytDGVQq4n7TthBlyiHyM9J1N3Wt7cOa242dpSmpv2Df";
         public static string Golbal_Passwd = "QiCUBrqBZkjjnIk936JIgszjtV0y2hG/cvTHmInbSOAhi8aP2josP0+z184FMwg4SqggC8zKe7Sj7aNd86Z9lmoinm5dma0iiN8m6Ygay7Pbnr1MsU4dFzVMTupHirW1";
         public static string Golbal_keydatei = "8d1EMUqLl47xoVPrn/8PaQ8iZlHf4rwy6xB2d2I5YHnUZ1oTdl6zowTLySleC4SsYn7sTiwfQsAaKgWE8uIkTBqCiRn+ikiKGo2DQ1CAEk41vcKajEsDyC3gQi2g58Yh";
 
@@ -57,7 +57,7 @@ namespace Vol
                 Console.WriteLine("\nPassword corect!");
                 Console.WriteLine("Starting conect:");
                 Console.WriteLine("[EXECUTING]: " + @"C:\Program Files\VeraCrypt\VeraCrypt.exe\ " + "/c /q /v " + StringCipher.Decrypt(Golbal_vonumendatei, passwd) + " /l i /p " + "[Password:Hide]" + /*StringCipher.Decrypt(Golbal_Passwd, passwd) +*/ " /k " + StringCipher.Decrypt(Golbal_keydatei, passwd) + "");
-                Process.Start(@"C:\Program Files\VeraCrypt\VeraCrypt.exe\", "/c /q /v " + StringCipher.Decrypt(Golbal_vonumendatei, passwd) + " /l i /p " + StringCipher.Decrypt(Golbal_Passwd, passwd) + " /k " + StringCipher.Decrypt(Golbal_keydatei, passwd) + "");
+                Process.Start(@"C:\Program Files\VeraCrypt\VeraCrypt.exe\", "/c /q /v " + StringCipher.Decrypt(Golbal_vonumendatei, passwd) + " /l q /p " + StringCipher.Decrypt(Golbal_Passwd, passwd) + " /k " + StringCipher.Decrypt(Golbal_keydatei, passwd) + "");
             }
             Console.Read();
         }
