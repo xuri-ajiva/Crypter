@@ -21,20 +21,30 @@ namespace decipher
 
             if (args.Length == 0)
                 UserImput();
-            if (args.Length != 3)
+            if (args.Length != 4)
             {
-                Console.WriteLine("Use: crypter [Decrypt: d / Encrypt: e] [Passwd] [PathToFile]"); Environment.Exit(-1);
+                Console.WriteLine("Use: crypter [Decrypt: d / Encrypt: e] [Bin: true/false] [Passwd] [PathToFile]"); Environment.Exit(-1);
             }
 
-            passwd = args[1];
-            file = args[2];
+            passwd = args[2];
+            file = args[3];
+            binery = bool.Parse(args[2]);
 
-
-            //en or decrypt
-            if (args[0].ToLower() == "d")
-                __Decrypt();
-            if (args[0].ToLower() == "e")
-               __Encrypt();
+            if (binery)
+            {
+                //en or decrypt
+                if (args[0].ToLower() == "d")
+                    __Decrypt();
+                if (args[0].ToLower() == "e")
+                    __Encrypt();
+            }
+            else
+            {
+                if (args[0].ToLower() == "e")
+                    Encrypt();
+                if (args[0].ToLower() == "d")
+                    Decrypt();
+            }
         }
 
         public static void Encrypt()
