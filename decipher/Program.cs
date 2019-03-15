@@ -28,7 +28,7 @@ namespace decipher
 
             passwd = args[2];
             file = args[3];
-            binery = bool.Parse(args[2]);
+            binery = bool.Parse(args[1]);
 
             if (binery)
             {
