@@ -11,7 +11,7 @@ namespace Vol
             //is not a working string 
         public static string _passwd_ = "fgTLbSyV1ymjO3unA0AGR7p+cQsT8QYf0ZQ/cjJ/SN3AEFbIsBNQ/LOkeii2GiDAX/FnT17lkJGJeAHDVu++vb2zzNUTRZuu38vyQ7LDmnTXkM7x3QsMeSJ5F0lnlGLj5O";
 
-        public static string Golbal_vonumendatei = "+Ah04ethGTlcopmDovkXupQ1iXCn//x0Kp6ehyqMUVZj2YTjPmgrzSL3XRk0X8UDYALBuecfOAuA6KxZxBIneytDGVQq4n7TthBlyiHyM9J1N3Wt7cOa242dpSmpv2Df";
+        public static string Golbal_vonumendatei = "CE9L2Dzu1Uiqd1oPQCbbuJv1zQ461S1iEgw71O0n7uIRoYNBEmuXoyMS2d2o2lllTljHOtNV5gM7CmHn/qCtmMBar5Khenll4dKgxosMCG+axGFKoMr+FmPudu2nI598";
         public static string Golbal_Passwd = "QiCUBrqBZkjjnIk936JIgszjtV0y2hG/cvTHmInbSOAhi8aP2josP0+z184FMwg4SqggC8zKe7Sj7aNd86Z9lmoinm5dma0iiN8m6Ygay7Pbnr1MsU4dFzVMTupHirW1";
         public static string Golbal_keydatei = "8d1EMUqLl47xoVPrn/8PaQ8iZlHf4rwy6xB2d2I5YHnUZ1oTdl6zowTLySleC4SsYn7sTiwfQsAaKgWE8uIkTBqCiRn+ikiKGo2DQ1CAEk41vcKajEsDyC3gQi2g58Yh";
 
@@ -45,7 +45,7 @@ namespace Vol
             
             //Console.WriteLine("passwd: "+StringCipher.Encrypt(passwd,passwd));
             //Console.WriteLine("Password: " + StringCipher.Encrypt(Golbal_Passwd, passwd));
-            //Console.WriteLine("Volu: "+ StringCipher.Encrypt(Golbal_vonumendatei,passwd));
+            Console.WriteLine("Volu: "+ StringCipher.Encrypt(Golbal_vonumendatei,passwd));
             //Console.WriteLine("Key: " + StringCipher.Encrypt(Golbal_keydatei, passwd));
 
 
