@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace decipher
@@ -13,38 +16,35 @@ namespace decipher
         public static string encryptedstring = "";
         public static string decryptedstring = "";
         public static string Info = "";
-        public static string Dateiname = "";
+        public static string DateiEndung = "";
         public static string name = "----------------------------------------------------------- decipher -----------------------------------------------------------\n";
         public static bool binery = false;
+        public static string new_Path = "";
+        private static string EncEndung = ".dec";
+
         private static void Main(string[] args)
         {
 
+            if (args.Length == 1) {
+                file = args[0];
+                UserImput();
+            }
             if (args.Length == 0)
                 UserImput();
-            if (args.Length != 4)
+            if (args.Length != 3)
             {
-                Console.WriteLine("Use: crypter [Decrypt: d / Encrypt: e] [Bin: true/false] [Passwd] [PathToFile]"); Environment.Exit(-1);
+                Console.WriteLine("Use: crypter [Decrypt: d / Encrypt: e] [Passwd] [PathToFile]"); Environment.Exit(-1);
             }
 
-            passwd = args[2];
-            file = args[3];
-            binery = bool.Parse(args[1]);
+            passwd = args[1];
+            file = args[2];
 
-            if (binery)
-            {
-                //en or decrypt
-                if (args[0].ToLower() == "d")
-                    __Decrypt();
-                if (args[0].ToLower() == "e")
-                    __Encrypt();
-            }
-            else
-            {
-                if (args[0].ToLower() == "e")
-                    Encrypt();
-                if (args[0].ToLower() == "d")
-                    Decrypt();
-            }
+            new_Path = Path.GetDirectoryName(file) + "\\" + Path.GetFileNameWithoutExtension(file);
+            if (args[0].ToLower() == "e")
+                Encrypt();
+            if (args[0].ToLower() == "d")
+                Decrypt();
+            Ende();
         }
 
         public static void Encrypt()
@@ -55,9 +55,8 @@ namespace decipher
             encryptedstring = Encryption.EncryptString(plaintext, passwd);
 
             //encryptedstring = StringCipher.Encrypt(plaintext, passwd);
+            new_Path += EncEndung;
 
-
-            var new_Path = Path.GetDirectoryName(file) + "\\" + Path.GetFileNameWithoutExtension(file) + ".dec";
             File.Create(new_Path).Close();
 
             var temp = StringExtensions.SplitInParts(encryptedstring, name.Length);
@@ -74,7 +73,6 @@ namespace decipher
             var bytes = Encoding.Unicode.GetBytes(name + finalstring + name);
             File.WriteAllBytes(new_Path, bytes);
             Console.WriteLine("Written all to: " + new_Path);
-            Ende();
         }
 
         public static void Decrypt()
@@ -96,19 +94,17 @@ namespace decipher
 
             //Console.WriteLine(encryptedstring);
 
-            //Console.Read();
-
             //decryptedstring = StringCipher.Decrypt(encryptedstring, passwd);
             decryptedstring = Encryption.DecryptString(encryptedstring, passwd);
 
             Info = "";
-            Dateiname = "";
+            DateiEndung = "";
             try
             {
                 var readlength = short.Parse(decryptedstring.Substring(0, 5));
                 Info = decryptedstring.Substring(5, readlength);
                 var _readlength = short.Parse(decryptedstring.Substring(5 + readlength, 5));
-                Dateiname = decryptedstring.Substring(10 + readlength, _readlength);
+                DateiEndung = decryptedstring.Substring(10 + readlength, _readlength);
                 decryptedstring = decryptedstring.Substring(5 + readlength + 5 + _readlength);
             }
             catch (Exception e)
@@ -116,28 +112,167 @@ namespace decipher
                 Console.WriteLine(e.Message);
             }
 
-            if (decryptedstring.Substring(0, 1) == "?")
-                decryptedstring = decryptedstring.Substring(1);
+            //if (decryptedstring.Substring(0, 1) == "?")
+            //    decryptedstring = decryptedstring.Substring(1);
+
+            new_Path += DateiEndung;
 
             Console.WriteLine("info: " + Info);
-
-            var new_Path = Path.GetDirectoryName(file) + "\\" + Path.GetFileNameWithoutExtension(file) + Dateiname;
             File.Create(new_Path).Close();
             File.WriteAllBytes(new_Path, Encoding.Unicode.GetBytes(decryptedstring));
             Console.WriteLine("Written all to: " + new_Path);
-            Ende();
         }
+
+        public static void Ende()
+        {
+            reset_vars();
+            Console.WriteLine("Finished!\nPress Any Key To Exit...");
+            var p = ParentProcessUtilities.GetParentProcess();
+            if(p.ProcessName.ToLower() != "cmd")
+                Console.ReadKey();
+            Environment.Exit(0);
+        }
+        private static void UserImput()
+        {
+            if (passwd == "")
+            {
+                Console.WriteLine("Please enter a password to use:");
+                passwd = Console.ReadLine();
+            }
+            if (file == "")
+            {
+                Console.WriteLine("Please enter a File to use:");
+                file = Console.ReadLine();
+            }
+
+            new_Path = Path.GetDirectoryName(file) + "\\" + Path.GetFileNameWithoutExtension(file);
+            string choise = "";
+
+            while (true)
+            {
+                Console.WriteLine("Encrypr/Decrypt? [E/D]:");
+                choise = Console.ReadLine();
+                if (choise.ToLower() == "e")
+                    Encrypt();
+                else if (choise.ToLower() == "d")
+                    Decrypt();
+                else
+                    continue;
+                Ende();
+            }
+        }
+        public static string fullsize(string daten = "teststring")
+        {
+            string result = "";
+            short length = (short)daten.Length;
+
+            //Console.WriteLine("length: "+ length+"  "+ length.ToString().Length+"   "+ Int16.MaxValue.ToString().Length);
+            for (int i = length.ToString().Length; i < short.MaxValue.ToString().Length; i++)
+            {
+                result += "0";
+            }
+
+            result += length.ToString();
+
+            result += daten;
+            return result;
+        }
+        private static void reset_vars()
+        {
+            passwd = "";
+            file = "";
+
+            plaintext = "";
+            encryptedstring = "";
+            decryptedstring = "";
+        }
+
+    }
+    /// <summary>
+    /// A utility class to determine a process parent.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct ParentProcessUtilities
+    {
+        // These members must match PROCESS_BASIC_INFORMATION
+        internal IntPtr Reserved1;
+        internal IntPtr PebBaseAddress;
+        internal IntPtr Reserved2_0;
+        internal IntPtr Reserved2_1;
+        internal IntPtr UniqueProcessId;
+        internal IntPtr InheritedFromUniqueProcessId;
+
+        [DllImport("ntdll.dll")]
+        private static extern int NtQueryInformationProcess(IntPtr processHandle, int processInformationClass, ref ParentProcessUtilities processInformation, int processInformationLength, out int returnLength);
+
+        /// <summary>
+        /// Gets the parent process of the current process.
+        /// </summary>
+        /// <returns>An instance of the Process class.</returns>
+        public static Process GetParentProcess()
+        {
+            return GetParentProcess(Process.GetCurrentProcess().Handle);
+        }
+
+        /// <summary>
+        /// Gets the parent process of specified process.
+        /// </summary>
+        /// <param name="id">The process id.</param>
+        /// <returns>An instance of the Process class.</returns>
+        public static Process GetParentProcess(int id)
+        {
+            Process process = Process.GetProcessById(id);
+            return GetParentProcess(process.Handle);
+        }
+
+        /// <summary>
+        /// Gets the parent process of a specified process.
+        /// </summary>
+        /// <param name="handle">The process handle.</param>
+        /// <returns>An instance of the Process class.</returns>
+        public static Process GetParentProcess(IntPtr handle)
+        {
+            ParentProcessUtilities pbi = new ParentProcessUtilities();
+            int returnLength;
+            int status = NtQueryInformationProcess(handle, 0, ref pbi, Marshal.SizeOf(pbi), out returnLength);
+            if (status != 0)
+                throw new Win32Exception(status);
+
+            try
+            {
+                return Process.GetProcessById(pbi.InheritedFromUniqueProcessId.ToInt32());
+            }
+            catch (ArgumentException)
+            {
+                // not found
+                return null;
+            }
+        }
+    }
+    public static class NotNeedet {
+        public static string file = Program.file;
+        public static string passwd = Program.passwd;
+        public static string plaintext = "";
+        public static string encryptedstring = "";
+        public static string decryptedstring = "";
+        public static string Info = "";
+        public static string DateiEndung = "";
+        public static string name = "----------------------------------------------------------- decipher -----------------------------------------------------------\n";
+        public static bool binery = false;
+        public static string new_Path = "";
+        private static string EncEndung = ".dec";
+
 
         public static void __Encrypt()
         {
-            EncDec.Encrypt(file, file+".dec", passwd);
-            Ende();
+            EncDec.Encrypt(file, file + ".dec", passwd);
+            Program.Ende();
         }
 
         public static void __Decrypt()
         {
-            EncDec.Decrypt(file,Path.GetDirectoryName(file)+"\\"+ Path.GetFileNameWithoutExtension(file), passwd);
-            Ende();
+            EncDec.Decrypt(file, Path.GetDirectoryName(file) + "\\" + Path.GetFileNameWithoutExtension(file), passwd);
+            Program.Ende();
         }
 
         public static void _Encrypt()
@@ -146,7 +281,7 @@ namespace decipher
 
             EncDec.Encrypt(file, temp_file, passwd);
 
-            plaintext = fullsize("User:" + Environment.UserName + "  MachineName:" + Environment.MachineName) + fullsize(Path.GetExtension(file));
+            plaintext = Program.fullsize("User:" + Environment.UserName + "  MachineName:" + Environment.MachineName) + Program.fullsize(Path.GetExtension(file));
 
             encryptedstring = Encryption.EncryptString(plaintext, passwd);
 
@@ -168,9 +303,9 @@ namespace decipher
             if (finalstring.Length > 128)
                 Console.WriteLine("expectete error!");
 
-            var byte1 = Encoding.ASCII.GetBytes(name + finalstring);
+            var byte1 = Encoding.Unicode.GetBytes(name + finalstring);
             var byte2 = File.ReadAllBytes(temp_file);
-            var byte3 = Encoding.ASCII.GetBytes(name);
+            var byte3 = Encoding.Unicode.GetBytes(name);
 
 
             byte[] bytes = new byte[byte1.Length + byte2.Length + byte3.Length];
@@ -200,7 +335,7 @@ namespace decipher
 
             File.WriteAllBytes(new_Path, bytes);
             Console.WriteLine("Written all to: " + new_Path);
-            Ende();
+            Program.Ende();
         }
 
         public static void _Decrypt()
@@ -222,14 +357,14 @@ namespace decipher
 
             }
 
-            var name_ = Encoding.ASCII.GetBytes(name);
+            var name_ = Encoding.UTF8.GetBytes(name);
 
             for (int i = 0; i < name_.Length; i++)
             {
                 if (name_[i] != list[i])
                 {
                     Console.WriteLine("error no suported file");
-                    Ende();
+                    Program.Ende();
                 }
             }
 
@@ -247,7 +382,7 @@ namespace decipher
 
             for (int i = 0; i < name.Length; i++)
             {
-                headers += Encoding.ASCII.GetString(new byte[] { list[0] });
+                headers += Encoding.Unicode.GetString(new byte[] { list[0] });
                 list.RemoveAt(0);
             }
 
@@ -262,7 +397,7 @@ namespace decipher
             if (encryptedstring.Substring(0, name.Length) != name)
             {
                 Console.WriteLine("keine gültige datei");
-                Ende();
+                Program.Ende();
             }
             encryptedstring = encryptedstring.Substring(name.Length);
             encryptedstring = encryptedstring.Substring(0, encryptedstring.Length - name.Length);
@@ -277,13 +412,13 @@ namespace decipher
             decryptedstring = Encryption.DecryptString(headers, passwd);
 
             Info = "";
-            Dateiname = "";
+            DateiEndung = "";
             try
             {
                 var readlength = short.Parse(decryptedstring.Substring(0, 5));
                 Info = decryptedstring.Substring(5, readlength);
                 var _readlength = short.Parse(decryptedstring.Substring(5 + readlength, 5));
-                Dateiname = decryptedstring.Substring(10 + readlength, _readlength);
+                DateiEndung = decryptedstring.Substring(10 + readlength, _readlength);
                 decryptedstring = decryptedstring.Substring(5 + readlength + 5 + _readlength);
             }
             catch (Exception e)
@@ -296,83 +431,13 @@ namespace decipher
 
             Console.WriteLine("info: " + Info);
 
-            var new_Path = Path.GetDirectoryName(file) + "\\" + Path.GetFileNameWithoutExtension(file) + Dateiname;
+            var new_Path = Path.GetDirectoryName(file) + "\\" + Path.GetFileNameWithoutExtension(file) + DateiEndung;
             File.Create(new_Path).Close();
             File.WriteAllBytes(new_Path, resultArr);
             Console.WriteLine("Written all to: " + new_Path);
-            Ende();
+            Program.Ende();
         }
-
-        private static void Ende()
-        {
-            reset_vars();
-            Console.WriteLine("Finished !");
-            Console.ReadKey();
-            Environment.Exit(0);
-        }
-
-        private static void UserImput()
-        {
-            Console.WriteLine("Please enter a password to use:");
-            passwd = Console.ReadLine();
-            Console.WriteLine("Please enter a File to use:");
-            file = Console.ReadLine();
-            Console.WriteLine("use binery mode (must use for a *.exe) [true/false]:");
-            var r = Console.ReadLine();
-
-            binery = bool.Parse(r);
-
-            Console.WriteLine(binery);
-
-            string choise = "";
-            while (true)
-            {
-                Console.WriteLine("Encrypr/Decrypt? [E/D]:");
-                choise = Console.ReadLine();
-
-                if (binery)
-                {
-                    if (choise.ToLower() == "e")
-                        __Encrypt();
-                    if (choise.ToLower() == "d")
-                        __Decrypt();
-                }
-                else {
-                    if (choise.ToLower() == "e")
-                        Encrypt();
-                    if (choise.ToLower() == "d")
-                        Decrypt();
-                }
-            }
-        }
-        private static string fullsize(string daten = "teststring")
-        {
-            string result = "";
-            short length = (short)daten.Length;
-
-            //Console.WriteLine("length: "+ length+"  "+ length.ToString().Length+"   "+ Int16.MaxValue.ToString().Length);
-            for (int i = length.ToString().Length; i < short.MaxValue.ToString().Length; i++)
-            {
-                result += "0";
-            }
-
-            result += length.ToString();
-
-            result += daten;
-            return result;
-        }
-        private static void reset_vars()
-        {
-            passwd = "";
-            file = "";
-
-            plaintext = "";
-            encryptedstring = "";
-            decryptedstring = "";
-        }
-
     }
-
     internal static class StringExtensions
     {
 

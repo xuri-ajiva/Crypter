@@ -38,12 +38,14 @@ namespace decipherMain
         {
             Cryptographer c = new Cryptographer("aaaaaaaa");
 
-            byte[] vs = Encoding.UTF8.GetBytes("hallo Wrlt\n\00");
+            byte[] vs = Encoding.Unicode.GetBytes("'sÙ%šM6›>‚êUÝãÄ›ýÿ%šM6›>‚êýÿãÄ›");
 
             printeByte(vs);
 
             var r =c.Encrypt(vs);
+            Console.WriteLine();
             printeByte(r);
+            Console.WriteLine();
             printeByte(c.Decrypt(r));
             //var handle = GetConsoleWindow();
             //FixExeptions();
@@ -66,7 +68,7 @@ namespace decipherMain
 
         private static void printeByte(byte[] b)
         {
-           Console.WriteLine(Encoding.UTF8.GetString(b));
+           Console.WriteLine(Encoding.Unicode.GetString(b));
         }
 
         private static void Consol()
