@@ -1,7 +1,245 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Security;
 using System.Text;
+using System.Xml.Serialization;
+using XMLSave;
+using decipherMain.Utils;
+
+namespace decipherMain
+{
+    internal static class Program
+    {
+        //* Kernel imports
+        [DllImport("kernel32.dll")]
+        public static extern IntPtr GetConsoleWindow();
+
+        [DllImport("user32.dll")]
+        public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        public const int SW_HIDE = 0;
+        public const int SW_SHOW = 5;
+        //*
+
+        private static string config = "config.xml";
+        private static bool startconsol = true;
+
+        private static string fileName = Path.GetFileNameWithoutExtension(System.Reflection.Assembly.GetExecutingAssembly().Location) + "_savedData.xml";
+        private static string name = "";
+        private static string passwd = "";
+        private static string exe = "";
+        private static string argus = "";
+        private static string helpstring = " -------- Help -------- \nuse:\n    set name:passwd:execute:argus\n    load - load saved config\n    save - save current config\n    exit - exit programm\n    show - shows current config\n    start -start with current config\n    clear - clear variables";
+
+        private static void Main(string[] args)
+        {
+            Cryptographer c = new Cryptographer("aaaaaaaa");
+
+            byte[] vs = Encoding.UTF8.GetBytes("hallo Wrlt\n\00");
+
+            printeByte(vs);
+
+            var r =c.Encrypt(vs);
+            printeByte(r);
+            printeByte(c.Decrypt(r));
+            //var handle = GetConsoleWindow();
+            //FixExeptions();
+            //load();
+            //loadConfig();
+            //if (!startconsol)
+            //    ShowWindow(handle, SW_HIDE);
+
+
+            //if (exe != "" && name != "")
+            //{
+            //    start();
+            //}
+            //while (startconsol)
+            //    Consol();
+            Console.WriteLine("Press any Key to exit...");
+            //if (!startconsol)
+                Console.ReadKey();
+        }
+
+        private static void printeByte(byte[] b)
+        {
+           Console.WriteLine(Encoding.UTF8.GetString(b));
+        }
+
+        private static void Consol()
+        {
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.Write(Environment.UserName + "@" + Environment.MachineName);
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.Write(" ~");
+            Console.ForegroundColor = ConsoleColor.DarkMagenta;
+            string path = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)).FullName;
+            if (Environment.OSVersion.Version.Major >= 6)
+            {
+                path = Directory.GetParent(path).ToString();
+            }
+
+            Console.WriteLine("" + Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location.Replace(path, "").Replace('/', '\\')) + "\\");
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.Write(" $ ~> ");
+            Console.ForegroundColor = ConsoleColor.White;
+            string comm = Console.ReadLine();
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Command(comm);
+        }
+
+        private static void FixExeptions()
+        {
+            if (!File.Exists(config))
+                File.Create(config).Close();
+            if (!File.Exists(fileName))
+                File.Create(fileName).Close();
+        }
+
+        private static void loadConfig()
+        {
+            FileStream fs = null;
+            try
+            {
+                XmlSerializer xs = new XmlSerializer(typeof(config));
+                fs = new FileStream(config, FileMode.Open, FileAccess.Read, FileShare.Read);
+                config c = (config)xs.Deserialize(fs);
+                startconsol = c.startconsol;
+                fs.Close();
+            }
+            catch (Exception e) { System.Console.WriteLine("ConfigFileLoadError: " + e.Message); fs.Close(); }
+
+        }
+
+        private static void Command(string comm)
+        {
+            if ((comm.ToLower() == "exit"))
+                Environment.Exit(0);
+            else if (comm.ToLower() == "help")
+                Console.WriteLine(helpstring);
+            else if (comm.ToLower() == "show")
+                Console.WriteLine("name: " + name + "\npasswd: " + passwd + "\nexe: " + exe + "\nargus: " + argus);
+            else if (comm.ToLower() == "load")
+                load();
+            else if (comm.ToLower() == "save")
+                save();
+            else if (comm.ToLower() == "start")
+                start();
+            else if (comm.ToLower() == "clear")
+                clear();
+            else
+            {
+                var vs = comm.Split(' ');
+                string data = "";
+                if (vs[0].ToLower() == "set")
+                {
+                    for (int i = 1; i < vs.Length; i++)
+                    {
+                        data += vs[i] + (vs.Length - 1 == i ? "" : " ");
+                    }
+                    //Console.WriteLine("|"+data + "|");
+                    var save = data.Split(':');
+                    name = save[0];
+                    passwd = save[1];
+                    exe = save[2];
+                    argus = save[3];
+                }
+                else if (vs[0].ToLower() == "editconfig")
+                {
+                    for (int i = 1; i < vs.Length; i++)
+                    {
+                        data += vs[i] + (vs.Length - 1 == i ? "" : " ");
+                    }
+                    //Console.WriteLine("|"+data + "|");
+                    var save = data.Split(':');
+                    startconsol = save[0] == "1" ? true : false;
+
+                    saveConfog();
+                }
+                else
+                    Console.WriteLine(helpstring);
+            }
+        }
+
+        private static void saveConfog()
+        {
+            try
+            {
+                config c = new config();
+                c.startconsol = startconsol;
+                dataSave.SaveData(c, config);
+            }
+            catch (Exception ex) { Console.WriteLine("ConfigFileSaveError: " + ex.Message); }
+        }
+
+        private static void start()
+        {
+            try
+            {
+
+                //var p = Process.Start("psexec.exe", $"\\\\{Environment.MachineName} -u {name} -p {passwd} {exe}");
+                var secure = new SecureString();
+                foreach (char c in passwd)
+                {
+                    secure.AppendChar(c);
+                }
+                var st = DateTime.Now;
+                var p = Process.Start(exe, argus, name, secure, null);
+                Console.Write("Started Process: |" + p.StartInfo.FileName + " " + p.StartInfo.Arguments + "| with id: |" + p.Id);
+                p.WaitForExit();
+                Console.WriteLine("| With time espand: |" + (DateTime.Now - st) + "|");
+            }
+            catch (Exception e) { System.Console.WriteLine("ProcessStartError: " + e.Message); }
+        }
+
+        private static void save()
+        {
+            try
+            {
+                Daten daten = new Daten();
+                daten.name = name;
+                daten.passwd = passwd;
+                daten.execute = exe;
+                daten.argus = argus;
+                dataSave.SaveData(daten, fileName);
+            }
+            catch (Exception ex) { Console.WriteLine("InitFileSaveError: " + ex.Message); }
+        }
+
+        private static void load()
+        {
+            if (File.Exists(fileName))
+            {
+                FileStream fs = null;
+                try
+                {
+                    XmlSerializer xs = new XmlSerializer(typeof(Daten));
+                    fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    Daten daten = (Daten)xs.Deserialize(fs);
+                    name = daten.name;
+                    passwd = daten.passwd;
+                    exe = daten.execute;
+                    argus = daten.argus;
+                    fs.Close();
+                }
+                catch (Exception e) { System.Console.WriteLine("InitFileLoadError: " + e.Message); fs.Close(); }
+            }
+        }
+
+        private static void clear()
+        {
+            Console.Clear();
+            name = "";
+            passwd = "";
+            exe = "";
+            argus = "";
+        }
+    }
+}
+
 
 namespace decipher
 {
@@ -16,7 +254,7 @@ namespace decipher
         public static string Dateiname = "";
         public static string name = "----------------------------------------------------------- decipher -----------------------------------------------------------\n";
         public static bool binery = false;
-        private static void Main(string[] args)
+        private static void DechipherMain(string[] args)
         {
 
             if (args.Length == 0)
@@ -49,7 +287,7 @@ namespace decipher
 
         public static void Encrypt()
         {
-            plaintext = Encoding.Unicode.GetString(File.ReadAllBytes(file));
+            plaintext = Encoding.UTF8.GetString(File.ReadAllBytes(file));
             plaintext = fullsize("User:" + Environment.UserName + "  MachineName:" + Environment.MachineName) + fullsize(Path.GetExtension(file)) + plaintext;
 
             encryptedstring = Encryption.EncryptString(plaintext, passwd);
@@ -71,7 +309,7 @@ namespace decipher
 
             //Console.WriteLine(name + "\n" + finalstring + name);
 
-            var bytes = Encoding.Unicode.GetBytes(name + finalstring + name);
+            var bytes = Encoding.ASCII.GetBytes(name + finalstring + name);
             File.WriteAllBytes(new_Path, bytes);
             Console.WriteLine("Written all to: " + new_Path);
             Ende();
@@ -79,7 +317,7 @@ namespace decipher
 
         public static void Decrypt()
         {
-            encryptedstring = Encoding.Unicode.GetString(File.ReadAllBytes(file));
+            encryptedstring = Encoding.UTF8.GetString(File.ReadAllBytes(file));
             //Console.WriteLine(encryptedstringToDencrypt);
             Console.WriteLine("");
 
@@ -123,20 +361,20 @@ namespace decipher
 
             var new_Path = Path.GetDirectoryName(file) + "\\" + Path.GetFileNameWithoutExtension(file) + Dateiname;
             File.Create(new_Path).Close();
-            File.WriteAllBytes(new_Path, Encoding.Unicode.GetBytes(decryptedstring));
+            File.WriteAllBytes(new_Path, Encoding.ASCII.GetBytes(decryptedstring));
             Console.WriteLine("Written all to: " + new_Path);
             Ende();
         }
 
         public static void __Encrypt()
         {
-            EncDec.Encrypt(file, file+".dec", passwd);
+            EncDec.Encrypt(file, file + ".dec", passwd);
             Ende();
         }
 
         public static void __Decrypt()
         {
-            EncDec.Decrypt(file,Path.GetDirectoryName(file)+"\\"+ Path.GetFileNameWithoutExtension(file), passwd);
+            EncDec.Decrypt(file, Path.GetDirectoryName(file) + "\\" + Path.GetFileNameWithoutExtension(file), passwd);
             Ende();
         }
 
@@ -337,7 +575,8 @@ namespace decipher
                     if (choise.ToLower() == "d")
                         __Decrypt();
                 }
-                else {
+                else
+                {
                     if (choise.ToLower() == "e")
                         Encrypt();
                     if (choise.ToLower() == "d")
