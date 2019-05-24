@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Build_Test", "Build_Test\Bu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "decipher 2.0", "decipher 2.0\decipher 2.0.csproj", "{3DF257D3-5893-4150-903B-D56513DD0199}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Container", "Container\Container.csproj", "{470F76B6-EA81-44DB-AA02-A0D864F9F68A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{3DF257D3-5893-4150-903B-D56513DD0199}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3DF257D3-5893-4150-903B-D56513DD0199}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3DF257D3-5893-4150-903B-D56513DD0199}.Release|Any CPU.Build.0 = Release|Any CPU
+		{470F76B6-EA81-44DB-AA02-A0D864F9F68A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{470F76B6-EA81-44DB-AA02-A0D864F9F68A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{470F76B6-EA81-44DB-AA02-A0D864F9F68A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{470F76B6-EA81-44DB-AA02-A0D864F9F68A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

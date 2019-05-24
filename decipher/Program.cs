@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using decipherMain.Utils;
 
 namespace decipher
 {
@@ -46,7 +47,6 @@ namespace decipher
                 Decrypt();
             Ende();
         }
-
         public static void Encrypt()
         {
             plaintext = Encoding.Unicode.GetString(File.ReadAllBytes(file));
